@@ -1,0 +1,118 @@
+
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.5cm]{geometry}
+
+\begin{document}
+
+\section{Valor Esperado, Variância e Desvio Padrão}
+
+Considere a variável aleatória $X$, que representa o número de requisições que exigem processamento adicional em um lote de 50 requisições independentes.
+
+Conforme estabelecido anteriormente, a probabilidade de uma requisição exigir processamento adicional é $p=0{,}08$. Assim, a variável aleatória segue uma distribuição binomial:
+
+\[
+X \sim \operatorname{Binomial}(50,0{,}08).
+\]
+
+O objetivo desta etapa é determinar o valor esperado, a variância e o desvio padrão de $X$, utilizando as propriedades da distribuição binomial e verificando os resultados por meio da linguagem R.
+
+\subsection{Valor Esperado}
+
+Para uma variável aleatória binomial, o valor esperado é dado por:
+
+\[
+E[X]=np.
+\]
+
+Substituindo os parâmetros:
+
+\[
+E[X]=50 \cdot 0{,}08.
+\]
+
+Portanto,
+
+\[
+\boxed{E[X]=4}.
+\]
+
+Esse resultado indica que, em média, espera-se que 4 das 50 requisições exijam processamento adicional.
+
+\subsection{Variância}
+
+A variância de uma variável aleatória binomial é definida por:
+
+\[
+\operatorname{Var}(X)=np(1-p).
+\]
+
+Substituindo os valores:
+
+\[
+\operatorname{Var}(X)
+=50 \cdot 0{,}08 \cdot (1-0{,}08).
+\]
+
+\[
+\operatorname{Var}(X)
+=50 \cdot 0{,}08 \cdot 0{,}92.
+\]
+
+Logo,
+
+\[
+\boxed{\operatorname{Var}(X)=3{,}68}.
+\]
+
+A variância expressa a dispersão do número de requisições que necessitam de processamento adicional em relação ao valor esperado.
+
+\subsection{Desvio Padrão}
+
+O desvio padrão corresponde à raiz quadrada da variância:
+
+\[
+DP(X)=\sqrt{\operatorname{Var}(X)}.
+\]
+
+Substituindo:
+
+\[
+DP(X)=\sqrt{3{,}68}.
+\]
+
+Portanto,
+
+\[
+\boxed{DP(X)\approx 1{,}9183}.
+\]
+
+O resultado indica uma dispersão típica de aproximadamente 1,92 requisição em torno do valor esperado.
+
+\subsection{Verificação Computacional em R}
+
+Os cálculos foram reproduzidos na linguagem R utilizando as expressões analíticas da distribuição binomial.
+
+A Tabela~\ref{tab:resultados} apresenta a comparação entre os valores calculados manualmente e os resultados computacionais.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{Medida} & \textbf{Manual} & \textbf{R} \\
+\hline
+Valor esperado & $4$ & $4$ \\
+Variância & $3{,}68$ & $3{,}68$ \\
+Desvio padrão & $1{,}9183$ & $1{,}9183$ \\
+\hline
+\end{tabular}
+\caption{Comparação dos resultados analíticos e computacionais.}
+\label{tab:resultados}
+\end{table}
+
+Observa-se concordância entre os resultados teóricos e computacionais, confirmando a aplicação das expressões do valor esperado, da variância e do desvio padrão para a distribuição binomial considerada.
+
+\end{document}
