@@ -1,0 +1,104 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{icomma}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+% Ajusta a numeração para iniciar em 1.4 no documento avulso
+\setcounter{section}{1}
+\setcounter{subsection}{3}
+
+\subsection{Cálculo de Probabilidades da Variável Aleatória $X$}
+\label{sec:q1_4}
+
+Define-se a variável aleatória discreta $X$ como o número de requisições que exigem processamento adicional em um lote de $n = 50$ requisições independentes recebidas por um serviço web. Conforme estabelecido na Seção~1.1 (a partir da maior matrícula da equipe, $M = 581706$) e na Seção~1.3, tem-se:
+\[
+X \sim \text{Binomial}(50;\, 0,08), \quad \text{com } E[X] = 4 \text{ e } DP(X) \approx 1,9183.
+\]
+
+O objetivo desta etapa é calcular, de forma analítica e computacional, as probabilidades $P(X \ge 20)$, $P(30 < X < 43)$, $P(X = 31)$ e o parâmetro auxiliar $r = P(X \ge E[X])$, utilizado na Questão~3. A verificação computacional foi realizada na linguagem R, utilizando apenas pacotes base e as funções nativas \texttt{dbinom()} e \texttt{pbinom()}. Por se tratar de cálculos estritamente determinísticos, não há necessidade de fixação de semente aleatória (\texttt{set.seed()}).
+
+\subsubsection{Formulação Teórica e Cálculos Manuais}
+
+A Função Massa de Probabilidade (PMF) de $X$ é dada por:
+\[
+P(X = k) = \binom{50}{k} (0,08)^k (0,92)^{50-k}, \quad k \in \{0, 1, 2, \dots, 50\}.
+\]
+
+Para viabilizar o cálculo manual nas caudas sem somar dezenas de parcelas extensas, utiliza-se a transformação logarítmica para probabilidades pontuais e a relação de recorrência entre termos consecutivos da Binomial:
+\[
+\frac{P(X = k+1)}{P(X = k)} = \frac{n - k}{k + 1} \cdot \frac{p}{1 - p} = \frac{50 - k}{k + 1} \cdot \frac{2}{23}.
+\]
+
+\begin{enumerate}
+    \item \textbf{Probabilidade $P(X \ge 20)$:} corresponde a $\sum_{k=20}^{50} P(X = k) = 1 - F_X(19)$. Inicialmente, calcula-se $P(X = 20)$ via logaritmo natural:
+    \[
+    \ln P(X = 20) = \ln\binom{50}{20} + 20\ln(0,08) + 30\ln(0,92) \approx 31,4839 - 50,5146 - 2,5015 = -21,5322,
+    \]
+    resultando em $P(X = 20) \approx e^{-21,5322} \approx 4,453 \times 10^{-10}$. Pela relação de recorrência, obtêm-se as razões decrescentes a partir de $k = 20$ ($q_{20} = \frac{30}{21} \cdot \frac{2}{23} \approx 0,1242$; $q_{21} \approx 0,1146$; $q_{22} \approx 0,1059$; $q_{23} \approx 0,0978$):
+    \begin{align*}
+    P(X = 21) &\approx 0,553 \times 10^{-10}, & P(X = 22) &\approx 0,063 \times 10^{-10}, \\
+    P(X = 23) &\approx 0,007 \times 10^{-10}, & P(X = 24) &\approx 0,001 \times 10^{-10}.
+    \end{align*}
+    Somando os termos dominantes (os demais são desprezíveis na terceira casa decimal), obtém-se $P(X \ge 20) \approx 5,077 \times 10^{-10}$.
+
+    \item \textbf{Probabilidade $P(X = 31)$:} aplicando logaritmos diretamente à PMF em $k = 31$ (sabendo que $\binom{50}{31} = \binom{50}{19} \approx 3,0406 \times 10^{13}$):
+    \[
+    \ln P(X = 31) = \ln\binom{50}{31} + 31\ln(0,08) + 19\ln(0,92) \approx 31,0457 - 78,2976 - 1,5843 = -48,8362,
+    \]
+    o que fornece $P(X = 31) \approx e^{-48,8362} \approx 6,176 \times 10^{-22}$.
+
+    \item \textbf{Probabilidade $P(30 < X < 43)$:} como $X$ é discreta e as desigualdades são estritas, o intervalo equivale a $\sum_{k=31}^{42} P(X = k) = F_X(42) - F_X(30)$. Partindo de $P(X = 31) \approx 6,176 \times 10^{-22}$ e aplicando a recorrência ($q_{31} = \frac{19}{32} \cdot \frac{2}{23} \approx 0,05163$ e $q_{32} = \frac{18}{33} \cdot \frac{2}{23} \approx 0,04743$):
+    \[
+    P(X = 32) \approx 3,189 \times 10^{-23}, \quad P(X = 33) \approx 1,51 \times 10^{-24}, \quad P(X = 34) \approx 0,07 \times 10^{-24}.
+    \]
+    Somando os termos dominantes, resulta em $P(30 < X < 43) \approx 6,511 \times 10^{-22}$.
+
+    \item \textbf{Probabilidade $r = P(X \ge E[X])$:} como $E[X] = 4$, utiliza-se a regra do complemento $r = P(X \ge 4) = 1 - P(X \le 3)$, avaliando individualmente os quatro primeiros termos:
+    \begin{align*}
+    P(X = 0) &= \binom{50}{0}(0,08)^0(0,92)^{50} \approx 0,015466, \\
+    P(X = 1) &= \binom{50}{1}(0,08)^1(0,92)^{49} \approx 0,067246, \\
+    P(X = 2) &= \binom{50}{2}(0,08)^2(0,92)^{48} \approx 0,143262, \\
+    P(X = 3) &= \binom{50}{3}(0,08)^3(0,92)^{47} \approx 0,199321.
+    \end{align*}
+    A soma resulta em $P(X \le 3) \approx 0,425295$ e, portanto, $r = 1 - 0,425295 = 0,574705$.
+\end{enumerate}
+
+\subsubsection{Verificação Computacional em R e Comparação}
+
+Na implementação em R, adotaram-se cuidados específicos contra erros de ponto flutuante (padrão IEEE~754). No cálculo de $P(X \ge 20)$, a forma complementar \texttt{1 - pbinom(19, 50, 0.08)} não colapsa para zero, mas perde cerca de 9 dos 16 dígitos significativos (retendo apenas 6 a 7 dígitos corretos); por isso, empregou-se \texttt{pbinom(19, 50, 0.08, lower.tail = FALSE)}. Já para $P(30 < X < 43)$, a subtração direta \texttt{pbinom(42, 50, 0.08) - pbinom(30, 50, 0.08)} colapsa para exatamente zero, pois ambas as acumuladas arredondam para $1$. Contornou-se esse efeito tanto pelo somatório direto via \texttt{sum(dbinom(31:42, 50, 0.08))} quanto pela diferença de caudas superiores (\texttt{pbinom(30, ..., lower.tail = FALSE) - pbinom(42, ..., lower.tail = FALSE)}), com consistência verificada automaticamente via \texttt{stopifnot(isTRUE(all.equal(...)))}.
+
+A Tabela~\ref{tab:probabilidades} compara os valores obtidos manualmente e em R, juntamente com o erro relativo (calculado adotando-se o valor em R como referência).
+
+\begin{table}[h!]
+\centering
+\caption{Comparação entre os cálculos manuais e computacionais (R) para $X \sim \text{Binomial}(50;\, 0,08)$.}
+\label{tab:probabilidades}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Evento} & \textbf{Valor Manual} & \textbf{Valor em R} & \textbf{Erro Relativo} \\ \midrule
+$P(X \ge 20)$ & $5,077 \times 10^{-10}$ & $5,0779 \times 10^{-10}$ & $0,017\%$ \\
+$P(30 < X < 43)$ & $6,511 \times 10^{-22}$ & $6,5108 \times 10^{-22}$ & $0,003\%$ \\
+$P(X = 31)$ & $6,176 \times 10^{-22}$ & $6,1761 \times 10^{-22}$ & $0,002\%$ \\
+$r = P(X \ge 4)$ & $0,574705$ & $0,574704$ & $0,0001\%$ \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Interpretação dos Resultados}
+
+Observa-se concordância em três a quatro algarismos significativos (e até a quinta casa decimal no caso de $r$), com erros relativos inferiores a $0,02\%$ em relação aos valores de referência em R; as pequenas discrepâncias decorrem exclusivamente do arredondamento e truncamento das parcelas manuais, e não de erro no método. Os resultados evidenciam o comportamento fortemente concentrado à esquerda e assimétrico positivo da distribuição $\text{Binomial}(50;\, 0,08)$:
+
+\begin{itemize}
+    \item \textbf{Ordem de grandeza de $P(X \ge 20)$:} a probabilidade de aproximadamente $5,08 \times 10^{-10}$ equivale a cerca de 1 ocorrência a cada 2 bilhões de lotes de 50 requisições, caracterizando um evento praticamente impossível sob operação normal.
+    \item \textbf{Incompatibilidade com o modelo em $P(X = 31)$ e $P(30 < X < 43)$:} observar 31 requisições pesadas em um lote de 50 ($62\%$ do lote) tem probabilidade de $6,18 \times 10^{-22}$. Mais do que um evento raro, tal ocorrência indicaria forte incompatibilidade com as hipóteses do modelo --- sugerindo alteração na probabilidade real $p$ (como um pico anômalo de carga) ou violação da independência entre requisições. Além disso, $P(X = 31)$ concentra cerca de $94,9\%$ de toda a probabilidade do intervalo $30 < X < 43$, reflexo direto da razão de decaimento $P(X = 32)/P(X = 31) \approx 0,0516$.
+    \item \textbf{Probabilidade $r = P(X \ge 4)$ e relação com a mediana:} o valor $r \approx 0,5747$ ($57,47\%$) indica que, em mais da metade dos lotes, o servidor processará ao menos 4 requisições adicionais. O fato de $r$ superar $0,5$ decorre de a mediana de $X$ ser igual a $4$, dado que $P(X \le 3) \approx 0,4253 < 0,5$ e $P(X \le 4) \approx 0,6289 \ge 0,5$. O objeto \texttt{r\_val} é exportado explicitamente via \texttt{saveRDS(r\_val, "r\_val.rds")} para reutilização direta na definição da temperatura crítica na Questão~3.
+\end{itemize}
+
+\end{document}
